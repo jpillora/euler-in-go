@@ -2,8 +2,8 @@ package main
 
 import (
 	"runtime"
-	"sort"
-	"strconv"
+
+	"github.com/jpillora/go-euler/euler"
 )
 
 func main() {
@@ -65,7 +65,7 @@ func (w *worker) palindrome(a int, b int) bool {
 	if a == b {
 		return false
 	}
-	if w.sortdigits(a) != w.sortdigits(b) {
+	if euler.SortDigitsWithCache(a, w.sortcache) != euler.SortDigitsWithCache(b, w.sortcache) {
 		return false
 	}
 	return true
@@ -91,40 +91,4 @@ func (w *worker) prime(n int) bool {
 	}
 	w.primecache[n] = true
 	return true
-}
-
-type sortRunes []rune
-
-func (s sortRunes) Less(i, j int) bool {
-	return s[i] < s[j]
-}
-
-func (s sortRunes) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s sortRunes) Len() int {
-	return len(s)
-}
-
-func (w *worker) sortdigits(n int) string {
-	var s string
-	s, ok := w.sortcache[n]
-	if ok {
-		return s
-	}
-	s = strconv.Itoa(n)
-	r := []rune(s)
-	for len(r) < 4 {
-		lenz := 4 - len(r)
-		z := make([]rune, lenz)
-		for i := 0; i < lenz; i++ {
-			z[i] = '0'
-		}
-		r = append(z, r...)
-	}
-	sort.Sort(sortRunes(r))
-	s = string(r)
-	w.sortcache[n] = s
-	return s
 }
